@@ -16,6 +16,25 @@ func NewSearchIndex() (*SearchIndex, error) {
 	// Create a mapping for our product
 	mapping := bleve.NewIndexMapping()
 	
+	// Create a document mapping that indexes name and category fields
+	productMapping := bleve.NewDocumentMapping()
+	
+	// Set up the name field mapping
+	nameFieldMapping := bleve.NewTextFieldMapping()
+	productMapping.AddFieldMappingsAt("name", nameFieldMapping)
+	
+	// Set up the category field mapping - enable indexing for this field
+	categoryFieldMapping := bleve.NewTextFieldMapping()
+	productMapping.AddFieldMappingsAt("category", categoryFieldMapping)
+	
+	// Disable indexing for ID field (it'll still be stored)
+	idFieldMapping := bleve.NewNumericFieldMapping()
+	idFieldMapping.Index = false
+	productMapping.AddFieldMappingsAt("id", idFieldMapping)
+	
+	// Add the document mapping to the index mapping
+	mapping.AddDocumentMapping("_default", productMapping)
+	
 	// Create an in-memory index
 	index, err := bleve.NewMemOnly(mapping)
 	if err != nil {
@@ -39,26 +58,44 @@ func (s *SearchIndex) IndexProduct(product models.Product) error {
 	return nil
 }
 
-// Search performs a search query and returns matching products
 func (s *SearchIndex) Search(query string, limit int) ([]models.Product, int, error) {
-	// Create a search query
-	q := bleve.NewMatchQuery(query)
+	fuzzyName := bleve.NewFuzzyQuery(query)
+	fuzzyName.SetField("name")
+	fuzzyName.SetFuzziness(1)
+
+	prefixName := bleve.NewPrefixQuery(query)
+	prefixName.SetField("name")
+
+	fuzzyCategory := bleve.NewFuzzyQuery(query)
+	fuzzyCategory.SetField("category")
+	fuzzyCategory.SetFuzziness(1)
+
+	prefixCategory := bleve.NewPrefixQuery(query)
+	prefixCategory.SetField("category")
+
+	wildcardName := bleve.NewWildcardQuery("*" + query + "*")
+	wildcardName.SetField("name")
+
+	wildcardCategory := bleve.NewWildcardQuery("*" + query + "*")
+	wildcardCategory.SetField("category")
+
+	q := bleve.NewDisjunctionQuery(fuzzyName, prefixName, wildcardName, fuzzyCategory, prefixCategory, wildcardCategory)
+
+	
+
 	searchRequest := bleve.NewSearchRequest(q)
 	searchRequest.Size = limit
 	searchRequest.Fields = []string{"id", "name", "category"}
-	
-	// Execute the search
+
 	searchResults, err := s.index.Search(searchRequest)
 	if err != nil {
 		return nil, 0, fmt.Errorf("error executing search: %v", err)
 	}
 
-	// Convert results back to products
 	products := make([]models.Product, 0, len(searchResults.Hits))
 	for _, hit := range searchResults.Hits {
 		var product models.Product
-		
-		// Extract fields from the stored fields
+
 		if idStr, ok := hit.Fields["id"].(float64); ok {
 			product.ID = int(idStr)
 		}
@@ -68,12 +105,13 @@ func (s *SearchIndex) Search(query string, limit int) ([]models.Product, int, er
 		if category, ok := hit.Fields["category"].(string); ok {
 			product.Category = category
 		}
-		
+
 		products = append(products, product)
 	}
 
 	return products, int(searchResults.Total), nil
 }
+
 
 // Close closes the index
 func (s *SearchIndex) Close() error {

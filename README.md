@@ -1,12 +1,12 @@
 # Product Search API
 
-A simple and efficient product search API built with Go that performs full-text search operations on 0.3 million product records.
+A simple and efficient product search API built with Go that performs full-text search operations on 1 million product records.
 
 ## Features
 
 - In-memory full-text search using Bleve
 - RESTful API using Chi router
-- Handles 0.3 million product records
+- Handles 1 million product records
 - Graceful shutdown
 - Memory-efficient implementation
 

@@ -77,7 +77,7 @@ func main() {
 	defer searchIndex.Close()
 
 	// Reduce the total number of products to stay within memory constraints
-	const totalProducts = 300000
+	const totalProducts = 1000000
 	const batchSize = 1000     
 	
 	log.Printf("Starting to generate and index %d products in batches of %d...\n", totalProducts, batchSize)
