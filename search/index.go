@@ -30,7 +30,7 @@ func NewSearchIndex() (*SearchIndex, error) {
 	// Disable indexing for ID field (it'll still be stored)
 	idFieldMapping := bleve.NewNumericFieldMapping()
 	idFieldMapping.Index = false
-	productMapping.AddFieldMappingsAt("id", idFieldMapping)
+	productMapping.AddFieldMappingsAt("id", idFieldMapping	)
 	
 	// Add the document mapping to the index mapping
 	mapping.AddDocumentMapping("_default", productMapping)

@@ -182,7 +182,15 @@ func main() {
 	// Shutdown server
 	if err := server.Shutdown(ctx); err != nil {
 		log.Printf("Server shutdown error: %v", err)
+	} else {
+		log.Println("Server shutdown complete")
 	}
 
-	log.Println("Server stopped")
+	// Close search index (graceful resource cleanup)
+	if err := searchIndex.Close(); err != nil {
+		log.Printf("Error closing search index: %v", err)
+	} else {
+		log.Println("Search index closed successfully")
+	}
+
 }
