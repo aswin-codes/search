@@ -2,6 +2,10 @@
 
 A simple and efficient product search API built with Go that performs full-text search operations on 1 million product records.
 
+## Decision Log
+
+[View the Decision Log on Google Docs](https://docs.google.com/document/d/17wd7sXPdkPsMiDlwdIoZ-lD0wqmpwxXfr8PGldKifpA/edit?usp=sharing)
+
 ## Features
 
 - In-memory full-text search using Bleve
