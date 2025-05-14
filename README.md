@@ -2,6 +2,13 @@
 
 A simple and efficient product search API built with Go that performs full-text search operations on 1 million product records.
 
+## Demo
+
+
+
+https://github.com/user-attachments/assets/34704c59-22b1-434f-b121-26b34c6a4ce0
+
+
 ## Decision Log
 
 [View the Decision Log on Google Docs](https://docs.google.com/document/d/17wd7sXPdkPsMiDlwdIoZ-lD0wqmpwxXfr8PGldKifpA/edit?usp=sharing)
